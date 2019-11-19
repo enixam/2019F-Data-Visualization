@@ -1,0 +1,54 @@
+
+
+
+```{r,echo=F}
+knitr::opts_chunk$set(message = F, warning = F,cache=T)
+```
+
+
+# Week 1  
+
+个人数据收集：2019年以来所有购买的书籍记录（不包括电子书）。  
+
+收集方式：通过淘宝、京东、当当上的购买记录，记录每条购买记录的购买时间、图书名称、所属类别和价格，直接录入 Excel 表格中。为了方便展示，将其导入 R ：
+```{r, message = F}
+library(tidyverse)
+library(readxl)
+personal_data <- read_excel("data/personal_data.xlsx") 
+
+personal_data$time <- lubridate::ymd(personal_data$time)
+DT::datatable(personal_data)
+```
+
+
+
+
+![](images\crap.jpg)
+
+上图借鉴了余晟《正则指引》的封面设计，保证原书的封面没有这么丑。
+
+
+
+**关于日常生活中的数据收集**  
+
+
+发生最频繁的个人数据收集可能是网站为了保持 HTTP 连接状态的两个技术，会话和 Cookies。Cookies被存储在用户本地终端上，用于保持服务器上会话的持续状态，包含了用户的访问时间等信息。  
+
+大量互联网公司(如 Google、Facebook)都会在用户不知情的情况下收集个人信息， 获取用户的浏览和搜索历史记录，安装的应用程序，年龄和性别等人口统计数据，以及在现实世界中购物等其他数据来源。Google 旗下的 Google Analytics 会跟踪十几亿账户的登录情况。  
+
+可以在 Chrome 浏览器中打开链接 https://takeout.google.com/settings/takeout?pli=1， 下载个人数据。可以看到被采集的数据包含位置、个人资料、购买记录、相册、书签、Youtube观看记录等类别：  
+
+
+```{r, fig.cap = "Google personal data 1", echo = FALSE}
+knitr::include_graphics("images\\google_1.png")
+```
+
+
+```{r, fig.cap = "Google personal data 2", echo = FALSE}
+knitr::include_graphics("images\\google_2.png")
+```
+
+
+
+此外，还有一些数据代理公司(data broker)，专门为其他公司提供用户的个人信息搜集服务。
+

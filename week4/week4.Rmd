@@ -1,0 +1,182 @@
+---
+title: "Plastic Crisis"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true  
+    source_code: embed
+    theme: sandstone  
+---
+
+
+```{r}
+library(tidyverse)
+library(RColorBrewer)
+library(plotly)
+```
+
+
+
+### Mismanaged Plastic Waste   
+
+
+
+```{r,fig.height=7}
+generation <- read_csv("plastic-waste-generation-total.csv") %>%
+  rename(total = `Plastic waste generation (tonnes, total) (tonnes per year)`) %>% 
+  select(c(1, 4)) %>% 
+  mutate(percentage = total / sum(total)) %>% 
+  arrange(desc(percentage))
+
+generation <- generation[1:40, ]
+
+inadequately_disposed <- read_csv("inadequately-managed-plastic.csv")
+
+littered <- read_csv("plastic-waste-littered.csv")
+
+
+label = ifelse(generation$Entity %in% c("China", "United States", "Brazil", 
+                                        "India", "New Zealand", "Indonesia", 
+                                        "Germany", "Swedan", "Spain", "Russia", 
+                                        "United Kingdom", "Egypt"), generation$Entity, "")
+
+mismanaged <- generation %>% 
+  left_join(inadequately_disposed) %>% 
+  left_join(littered) %>% 
+  rename(`Inadequately Disposed` = `Share of plastic inadequately managed (%)`,
+         Littered = `Plastic waste littered (tonnes per year)`,
+         `Total` = total) %>% 
+  select(c(1, 2, 6, 7)) %>% 
+  mutate(`Inadequately Disposed` = `Inadequately Disposed` / 100) %>% 
+  mutate(`Total Production` =  cut(Total, 
+        breaks = c(1000000, 2000000, 3000000, 4000000, 5000000, Inf), 
+        labels = c("1 ~ 2 mmt", "2 ~ 3 mmt", "3 ~ 4 mmt", "4 ~ 5 mmt", "> 5 mmt"))) %>%
+  rename(Country = Entity)
+
+p1 <- ggplot(mismanaged, aes(`Inadequately Disposed`, Littered, label = Country)) + 
+  geom_point(aes(size = Total, fill = `Total Production`), shape = 21) + 
+  geom_text(aes(label = label), nudge_x = 0.08) +
+  scale_size(range = c(1, 12), guide = F) + 
+  scale_y_continuous(labels = scales::comma) + 
+  scale_x_continuous(labels = scales::percent) +  
+  scale_fill_manual(values = rev(brewer.pal(name = "RdYlBu", n = 5))) +
+  labs(title = "Mismanaged plastic waste among top 40 producers", 
+       x = "Share of plastic inadequately managed",
+       y = "Plastic littered(tonnes)") + 
+  hrbrthemes::theme_ipsum(
+                          grid = "Y",
+                          plot_title_size = 18,
+                          axis_title_size = 12)
+
+
+
+ggplotly(p1, tooltip = c("fill", "x", "y", "label"))
+
+```
+
+---  
+
+2018 年，世界总塑料产量接近 $3.6$ 亿吨，累积产量超过 $80$ 亿吨。水能载舟，亦能覆舟。塑料制品让人们享受了前所未有的便利，它们的遗体——塑料垃圾却在世间挥之不去。庞大的塑料产量中，最终近八成被填埋或流落于自然环境。$12\%$ 被焚烧，只有 $9\%$ 实现了回收再生。2017 年，BBC 在纪录片《蓝色星球 2》中将镜头对准了试图吞噬蓝色塑料桶的抹香鲸，与大西洋孤岛沙滩上堆积如山的塑料袋，越来越多的人意识到: 这种难以降解、韧如蒲苇的的污染物已经入侵至地球上最静谧的角落。  
+
+若仅从塑料垃圾制造量赏罚褒贬，发达国家、高收入国家似乎是白色污染的元凶，它们在世界十大塑料垃圾生产国家中占据了八席。然而，真正决定污染风险是是塑料废弃物处理水平的高下。“**处理不当**”（mismanaged）的废弃物主要分为两类：加工不足（inadequately disposed）的废弃物未经过完整的循环处理工序便离开工厂，而被丢弃（littered）的废弃物则直接被个人或组织遗弃在自然界中。  
+
+将塑料废弃水平纳入考量后，我们发现，大部分发达国家虽有较高的塑料总产量，但废弃处理能力也普遍较好（图中左下角）。而大量发展中国家、中低收入国家在生产大量塑料的同时，废弃物处理水平亟需提高(数据来自 2010 年)。  
+
+
+### Waste to the Oceans   
+
+
+```{r}
+library(highcharter)
+rivers <- read_csv("plastic-top-20-rivers.csv") %>% 
+  select(1, 4) %>% 
+  arrange(desc(`Plastic mass input from rivers (tonnes)`)) %>% 
+  filter(Entity != "World", Entity != "Africa", Entity != "Europe",
+         Entity != "Central & North America", Entity != "Asia",
+         Entity != "Australia-Pacific", Entity != "South America") %>% 
+  rename(input = `Plastic mass input from rivers (tonnes)`)
+
+rivers$River <- factor(rivers$Entity, levels = fct_reorder(rivers$Entity, rivers$input))
+
+p2 <- ggplot(rivers[1:7, ], aes(River, input)) + 
+  geom_bar(stat = "identity", color = "white", fill = "#1380A1") + 
+  geom_hline(yintercept = 0, size = 2) + 
+  scale_y_continuous(labels = scales::comma) + 
+  bbplot::bbc_style() + 
+  theme(plot.title = element_text(size = 18),
+        axis.text.x = element_text(size = 12),
+        axis.title.x = element_blank(),
+        panel.grid.major.x = element_blank()) + 
+  labs(title = "Top 7 Rivers transporting plastic(tonnes) into the oceans") 
+ggplotly(p2)
+
+```
+
+
+
+---  
+
+海洋环境是塑料污染的最大受害者，近年来，每年有 $800 \sim 1200$ 万吨塑料废弃物最终流入海洋，其中约 $70\% \sim 80\%$ 为通过**河流系统**进入的陆地废弃物。  
+
+图中列出了 2015 年流量最大的 7 个河流污染源，分别为扬子江（中国）、恒河（印度，孟加拉国）、绥江（中国）、黄浦江（中国）、克里斯河（尼日利亚）、亚马逊河（巴西、秘鲁、哥伦比亚）、布兰塔斯河（印度尼西亚）。  世界范围内塑料废弃物流量前 $20$ 的河流中(途中未列出），中国河流占据 $6$ 席。  
+
+进入海洋的塑料垃圾有怎样的危害？一项研究回顾了塑料废弃物对动物的直接伤害类型，总结了如“摄入中毒”、“缠绕”和“冲撞”等分类。微小的塑料碎片（微塑料，microplastic）可以成为其他有机污染物扩散的载体。除此之外，一些塑料制品会在一定条件下释放温室气体，进而伤害生态多样性。  
+
+
+### China's Import Ban    
+
+```{r}
+library(highcharter)
+plastic_imports <- read_csv("chinese-plastic-imports.csv") %>% 
+  select(-1, -2) %>% 
+  pivot_longer(-1, 
+               names_to = "Type",
+               values_to = "Plastic waste (tonnes)")
+
+hc <- hchart(plastic_imports, "column", hcaes(x = Year, y = `Plastic waste (tonnes)` , group = Type)) %>% 
+  hc_title(text = "China: A voracious plastic consumer", align = "center",
+           style = list(fontWeight = "bold", fontSize = "24px"))  
+hc %>% 
+  hc_add_theme(hc_theme_ffx())
+```
+
+
+
+---  
+
+
+尽管尚未有研究证实处理不当的塑料废弃物有能力对人类造成直接威胁，但它们确能“抢夺”牲畜的觅食场所，污染土壤和水源，堵塞排水管道。它们还是滋养苍蝇、蚊子等害虫的温床。世界卫生组织 2018 年发布的一篇报告显示，积水的塑料垃圾养育了大量携带登革热的蚊虫。  
+
+长久以来，中国是世界上最大的塑料垃圾进口国家，每年接受全球超过 $45 \%$ 的塑料废弃物，这种低廉的原材料支撑了经济增长，也伤害着国土环境。中国不是此间特例，大量发展中国家、低收入国家接收了巨量发达世界运送来的塑料废弃物，而它们落后的处理技术让原本可以光荣退役的塑料化身为真正的白色幽灵。  
+
+
+2016 年 11 月 7 日，《固体废物污染环境防治法》通过修订，禁止或限制进口欧包括塑料废弃物在内的一众固体废物。同年末，海关总署联合生态环境部、商务部、发展改革委等部门开展“国门利剑”打私联合专项行动，将打击“洋垃圾”进口作为一号工程。2017 年，中国塑料废弃物进口下降超过 $20\%$，回退至 2006 年水平。2018 年，进口量跌至 $76430$ 吨。  
+
+
+###  Displaced Waste
+
+
+```{r}
+accumulation <- read_csv("displaced-plastic-chinese-import-ban.csv") %>% 
+  .[2:4, ] %>% 
+  select(-1, -2) %>%
+  pivot_longer(2:4,
+               names_to = "percent",
+               values_to = "accumulation")
+
+```
+
+```{r}
+hchart(accumulation, "area", hcaes(x = Year, y = accumulation, group = percent)) %>% 
+  hc_title(text = "Estimated amount of displaced plastic waste", align = "center" ,
+           style = list(fontSize = 20, fontFace = "bold"))  %>%
+  hc_subtitle(text = "After China's import ban", align = "center") %>%
+  hc_add_theme(hc_theme_ffx())
+```
+
+---  
+
+
+
+美国学者 Brooks, A. L 等人预测，如果中国的塑料禁令不再放宽，到 2030 年世界上将有超过 $1$ 亿吨塑料垃圾无处安放。即便塑料进口量恢复至 2017 年以前的 $50\%$，也将有 $5000$ 万吨垃圾无家可归。
+
+

@@ -1,0 +1,16 @@
+bookdown::gitbook:
+  toc_depth: 2
+  dev: svglite
+  css: css/style.css
+  config:
+    toc:
+      collapse: none
+      before: |
+        <li><a href="./">可视化工具与应用 课程作业</a></li>
+      after: |
+        <li><a href="https://bookdown.org" target="blank">written with bookdown</a></li>
+
+
+
+
+

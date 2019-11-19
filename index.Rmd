@@ -1,0 +1,22 @@
+--- 
+title: '可视化软件工具与应用 课程作业'
+author: "闫求识"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+always_allow_html: yes
+new_session: TRUE
+github-repo: enixam/2019F-data-visualization
+bibliography: bib.bib
+biblio-style: "apalike"
+link-citations: true
+--- 
+
+
+# Preface {-}
+
+This bookdown project contains my code and solutions to the data visualization course https://github.com/haoyuns/Fall-2019.   
+
+
+
+

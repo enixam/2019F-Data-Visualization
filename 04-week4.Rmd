@@ -1,0 +1,29 @@
+
+
+# Week 4  
+
+```{r,echo=F}
+knitr::opts_chunk$set(message = F, warning = F,cache=T)
+```
+
+启发： 纪录片《蓝色星球2》中塑料污染的画面，2019 “国门利剑” 行动的相关宣传，《国家地理》“环太平洋垃圾带”可视化作品  
+
+参考文献与数据：  
+
+1. Jambeck, J. R., Geyer, R., Wilcox, C., Siegler, T. R., Perryman, M., Andrady, A., … & Law, K. L. (2015). *Plastic waste inputs from land into the ocean*. Science, 347(6223), 768-771. http://science.sciencemag.org/content/347/6223/768 : 各国塑料废弃物生产总量，两种处理不良情况的数据  
+
+2. Lebreton, L. C., Van der Zwet, J., Damsteeg, J. W., Slat, B., Andrady, A., & Reisser, J. (2017). *River plastic emissions to the world’s oceans*. Nature Communications, 8, 15611. 	https://www.nature.com/articles/ncomms15611 : 河流污染数据，塑料垃圾在环境系统中的危害  
+
+3. Brooks, A. L., Wang, S., & Jambeck, J. R. (2018). *The Chinese import ban and its impact on global plastic waste trade*. Science Advances, 4(6), eaat0131.	http://advances.sciencemag.org/content/4/6/eaat0131 : 中国塑料垃圾进口情况和预测  
+
+4. 国家统计局、商务部：核实塑料垃圾进口数据  
+
+5. Rochman, C. M., Browne, M. A., Underwood, A. J., Van Franeker, J. A., Thompson, R. C., & Amaral‐Zettler, L. A. (2016). *The ecological impacts of marine debris: unraveling the demonstrated evidence from what is perceived*. Ecology, 97(2), 302-312. https://esajournals.onlinelibrary.wiley.com/doi/full/10.1890/14-2070.1. : 总结了塑料垃圾对海洋生物的伤害类型  
+
+6. https://opendocs.ids.ac.uk/opendocs/handle/20.500.12413/14490 ：介绍塑料垃圾对环境、人类的伤害   
+
+7. https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-05-21： 提供了几份整洁的数据  
+
+8. https://ourworldindata.org/plastic-pollution： 借鉴文章结构、思路   
+
+9. 海关总署、生态环境部、司法部：汇总有关法律信息  
