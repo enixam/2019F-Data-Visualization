@@ -1,4 +1,6 @@
 
+
+<!--
  This is a  homework repository for https://github.com/haoyuns/Fall-2019
  
  作业可见：https://bookdown.org/Maxine/cuc-dataviz-/  
@@ -8,3 +10,28 @@
  Week 3 ：https://bookdown.org/Maxine/cuc-dataviz-/week-3.html   
  Week 4： https://bookdown.org/Maxine/plastic_problems/   过程和参考文献: https://bookdown.org/Maxine/cuc-dataviz-/week-4.html  
  Week 5 ~ 6： https://bookdown.org/Maxine/cuc-dataviz-/week-5-6.html  
+ -->
+
+# 期末作业过程描述   
+
+https://www.rpubs.com/Maxine/american_school_diversity
+
+选题想法： [Washington Post 的报道](https://www.washingtonpost.com/graphics/2019/local/school-diversity-data/)，数据量在 3 w 行以内，有天然的地理层级关系，适合分析结构。  
+
+涉及数据： 
+
+- 2017 年和 1995 年的学校多样性数据，经过 Washington Post 的预处理，可以在 https://github.com/WPMedia/student_integration_analysis/blob/master/output%20data/student_diversity_integration_output.csv 找到  
+
+- 美国各州、部分学区的形状文件，通过 `tigris` 和 `tidycensus` 获得  
+
+- 2017 年美国社区调查数据，通过 `tidycensus` 获得    
+
+视觉呈现的选择：  
+
+- 分面地图、坡度图、三角坐标图描述 1995 年到 2017 年美国各州校园种族多样性的变化对比
+- 山脊图以简洁的方式刻画 DI 在四个分区，两个年份的分布差异  
+- 交互地图利于读者的探索性发现和分析  
+- 散点图描述两个变量之间相关性  
+
+
+ 
