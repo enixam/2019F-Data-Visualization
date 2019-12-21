@@ -39,5 +39,14 @@ https://www.rpubs.com/Maxine/american_school_diversity
 2. 描述性分析 DI 的（地理）分布特征
 3. 结合文献，探究 DI 的影响的影响因素
    - 种族隔离 
-   - 收入差距
- 
+   - 收入差距  
+   
+文件说明 
+- final_update / final_update.Rmd 生成网页的源文件
+- final_update / data 
+  -  `student_integration_output.csv` Washington Post 提供的 1995 年和 2017 年美国各校区的多样性数据  
+  - `region.csv` 美国各州所属的地理大区，用于山脊图
+  - `least_diverse_shape.rds` 和 	`most_diverse_shape.rds`, 最多样和最不多样的 5 个州的形状文件，可用 `readr::read_rds()` 读取  
+ -  `ggtern.R` 三角坐标图代码
+ - `income.rds` 2017 年 ACS 中各州工资中位数
+ - `res_seg.rds` 2017 年 ACS 中各州种族人口分布
