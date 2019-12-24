@@ -34,8 +34,8 @@ tidycensus::get_acs("state", variables = c(
  asian = "C02003_006",
  aian = "C02003_005",
  other = "C02003_008",
- multi = "C02003_009") %>% 
- readr::write_rds("income.rds")
+ multi = "C02003_009")) %>% 
+readr::write_rds("income.rds")
  
 # 工资中位数                                       
 tidycensus::get_acs("state", variables = c(
@@ -48,7 +48,7 @@ tidycensus::get_acs("state", variables = c(
   "multi_income" = "B19013G_001",
   "hispanic_income" = "B19013I_001"
 )) %>% 
-   readr::write_rds("res_seg.rds")                                                               
+  readr::write_rds("res_seg.rds")                                                               
 ```
 
 
