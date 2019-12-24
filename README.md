@@ -28,12 +28,14 @@ https://www.rpubs.com/Maxine/american_school_diversity
 
 ```r
 # 种族人口分布
-tidycensus::get_acs("state", variables = c(white = "C02003_003",
-                                       black = "C02003_004",
-                                       asian = "C02003_006",
-                                       aian = "C02003_005",
-                                       other = "C02003_008",
-                                       multi = "C02003_009")
+tidycensus::get_acs("state", variables = c(
+ white = "C02003_003",
+ black = "C02003_004",
+ asian = "C02003_006",
+ aian = "C02003_005",
+ other = "C02003_008",
+ multi = "C02003_009")
+ 
 # 工资中位数                                       
 tidycensus::get_acs("state", variables = c(
   "income" = "B19013_001",
