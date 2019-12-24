@@ -24,7 +24,31 @@ https://www.rpubs.com/Maxine/american_school_diversity
 
 - 美国各州、部分学区的形状文件，通过 `tigris` 和 `tidycensus` 获得  
 
-- 2017 年美国社区调查数据，通过 `tidycensus` 获得    
+- 2017 年美国社区调查数据，通过 `tidycensus` 获得      
+
+```r
+# 种族人口分布
+tidycensus::get_acs("state", variables = c(white = "C02003_003",
+                                       black = "C02003_004",
+                                       asian = "C02003_006",
+                                       aian = "C02003_005",
+                                       other = "C02003_008",
+                                       multi = "C02003_009")
+# 工资中位数                                       
+tidycensus::get_acs("state", variables = c(
+  "income" = "B19013_001",
+  "white_income" = "B19013H_001",
+  "black_income" = "B19013B_001",
+  "aian_income" = "B19013C_001",
+  "asian_income" = "B19013D_001",
+  "other_income" = "B19013F_001",
+  "multi_income" = "B19013G_001",
+  "hispanic_income" = "B19013I_001"
+))
+                                       
+                                   
+```
+
 
 视觉呈现的选择：  
 
