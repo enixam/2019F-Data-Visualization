@@ -9,7 +9,7 @@ output:
     toc_float: true
     includes: 
       before_body: header.html
-    css: css.css
+    css: style.css
 bibliography: bib.bib
 biblio-style: "apalike"
 link-citations: true
@@ -25,7 +25,7 @@ knitr::opts_chunk$set(warning=F,message=F,echo=F)
 
 自 1954 年布朗诉托皮卡教育委员会案正式挑战教育领域内的“隔离但平等”原则以来，美国的黑人等少数族裔开始追求实质上的教育平等权，为后来的种族平权运动奠定了基础。1960 年代，种族定额制全面废除，教育领域内的种族平权在最高法院的判决下得以稳固。21 世纪后，亚裔、拉丁裔等其他少数族裔逐渐在种族平权的斗争中取得了与黑人于非遗可相比拟的地位 [@袁云花2019美国教育领域种族平权研究]。几十年来，美国校园内的种族多样化取得了长足的进步。  
 
-为了衡量任意校区的种族多样性指数，采用的**种族多样性指数**(Diversity Index, 简称 DI)， 定义为校区内多数族裔占学术总数的比例。 DI 越小，表明该校区在种族上越多样：  
+为了衡量任意校区的种族多样程度，采用 **种族多样性指数** (Diversity Index, 简称 DI)， 定义为校区内多数族裔占学生总数的比例。 DI 越小，表明该校区在种族上越多样：  
 
 $$
 种族多样性指数 = \frac{多数种族人数}{校区总人数}
@@ -51,6 +51,7 @@ library(tmap)
 library(mapview) # mapview()
 library(ggridges)
 library(ggrepel)
+library(janitor)
 ```
 
 ```{r,message=F}
@@ -64,12 +65,12 @@ loadfonts() ## You need to do this at the beginning of a session.
 
 
 <center>
-```{r,out.w}
+```{r}
 knitr::include_graphics("slope_graph.png")
 ```
 </center>
 
-```{r raw-data, cache = T}
+```{r raw-data}
 raw_data <- read_csv("data/student_integration_output.csv") %>%
   janitor::clean_names() %>% 
   mutate(school_year = str_extract(school_year, "\\d{4}$")) %>% 
@@ -89,31 +90,31 @@ raw_data <- read_csv("data/student_integration_output.csv") %>%
 
 
 
-```{r , cache = T}
+```{r ,}
 diversity_2017 <- raw_data %>%
   filter(year == 2017)
 diversity_1995 <- raw_data %>% 
   filter(year == 1995)
 ```
 
-```{r diversity-2017-pivoted, cache = T}
+```{r diversity-2017-pivoted}
 diversity_2017_pivoted <- diversity_2017 %>% 
   pivot_longer(aian:multi, names_to = "race", values_to = "prop")
 ```
 
-```{r diversity-1995-pivoted, cache = T}
+```{r diversity-1995-pivoted}
 diversity_1995_pivoted <- diversity_1995 %>% 
   pivot_longer(aian:multi, names_to = "race", values_to = "prop")
 ```
 
-```{r diversity-2017, cache = T}
+```{r diversity-2017}
 diversity_2017 <- diversity_2017_pivoted %>% 
   group_by(leaid) %>% 
   summarize(DI = max(prop, na.rm = TRUE)/ 100) %>% 
   right_join(diversity_2017)
 ```
 
-```{r diverstiy-1995, cache = T}
+```{r diverstiy-1995}
 diversity_1995 <- diversity_1995_pivoted %>% 
   group_by(leaid) %>% 
   summarize(DI = max(prop, na.rm = TRUE)/ 100) %>% 
@@ -122,10 +123,10 @@ diversity_1995 <- diversity_1995_pivoted %>%
 
 
 
-```{r DI-by-state, cache = T}
+```{r DI-by-state}
 # Diversity was defined by the proportion of students in the dominant racial group. Diverse districts are places where fewer than 75 percent of students are of the same race. Undiverse districts are where 75 to 90 percent of students are the same race. In extremely undiverse districts one racial group constitutes more than 90 percent of students.
 DI_by_state_2017 <- diversity_2017 %>% 
-  mutate(GEOID = str_sub(leaid, 1, 2)) %>%  # to join with state_laea
+  mutate(GEOID = str_sub(leaid, 1, 2)) %>%  # for joining with state_laea
   mutate_at(vars(aian:multi), ~ .x / 100 * total) %>% 
   group_by(st, state, GEOID) %>% 
   summarize_at(vars(aian:multi), sum, na.rm = T) %>% 
@@ -165,7 +166,7 @@ DI_by_state_1995[54, ]$diverse <-NA
 
 
 
-```{r state-map, cache = T, fig.height = 8.5, fig.width = 8.5, cache = T}
+```{r state-map, cache = T, fig.height = 8.5, fig.width = 8.5}
 state_shape <- state_laea %>% 
   st_transform(2163)
 
@@ -190,7 +191,9 @@ tmap_mode("plot")
 map_by_state_2017 %>% 
   mutate(DI = round(DI, 2)) %>%
   st_drop_geometry() %>% 
-  select(-st) %>% 
+  select(-GEOID, -st, -diverse) %>% 
+  pivot_wider(names_from = "year", values_from = "DI") %>% 
+  remove_missing() %>% 
   DT::datatable(filter = "bottom")
 
 tm_shape(map_by_state_2017) + 
@@ -201,8 +204,6 @@ tm_shape(map_by_state_2017) +
   tm_text("st", size = "AREA") + 
   tm_style("natural") + 
   tm_compass(type = "8star", position = c(0.1, 0.85), size = 2) +
-  tm_scale_bar(width = 0.3, text.size = 1.2,
-               position = c(0.5, 0.02)) +
   tm_layout(frame = FALSE,
             legend.bg.alpha = 0,
             legend.frame = FALSE,
@@ -230,7 +231,7 @@ ggtern_plot
 
 # 地域分布特征  
 
-从 DI 的地域分布特征来看，西部比南部更多样，南部比北部更多样：
+从 DI 的地域分布特征来看，**西部比南部更多样，南部比北部更多样**：
 
 ```{r region-map, fig.width = 10, cache = T}
 diversity_1995 %>%
@@ -253,9 +254,9 @@ diversity_1995 %>%
 
 
 
-这样的分布现象当然与美国特有的历史文化传统有关。一些研究同时指出[@fisher2015not;  @cohn201610]，经济水平、开放程度、对移民的吸引力同样是影响一个地区种族多样性的重要因素。一般而言，地区经济实力越强，对移民吸引力越高，便倾向于有更高的种族多样性，而这样的客观现实又潜移默化地重塑了该地区的文化观念，形成促进种族多样的良性循环。  
+这样的分布现象当然与美国特有的历史文化传统有关。一些研究同时指出[@fisher2015not;  @cohn201610]，经济水平、开放程度、对移民的吸引力同样是影响一个地区种族多样性的重要因素。**一般而言，地区经济实力越强，对移民吸引力越高，便倾向于有更高的种族多样性**，而这样的客观现实又潜移默化地重塑了该地区的文化观念，形成促进种族多样的良性循环。  
 
-我们分别选出 5 个 “最多样” 和 “最不多样” 的州，一定程度可以印证这种说法，最多样的州（蓝色底色）靠近海岸和边境，不少处于著名的移民城市；而最不多样（红色底色）的州或处于内陆，或人口稀少，经济较为落后：  
+我们分别选出 5 个 “最多样” 和 “最不多样” 的州，一定程度可以印证这种说法，最多样的州（蓝色底色）靠近海岸和边境，不少处于著名的移民城市；而最不多样（红色底色）的州或处于内陆，或人口稀少，经济较为落后(简便起见，图中只给出了$DI > 95\%$ 或者 $DI < 50\%$ 的校区)：  
 
 ```{r}
 # diversity_2017_pivoted %>%
@@ -271,14 +272,14 @@ diversity_1995 %>%
 
 most_diverse <- diversity_2017 %>% 
   filter(st %in% c("DE", "FL", "MD", "NC", "NV")) %>% 
-  select(state, st, lea_name, leaid, d_locale_txt, diverse, total, aian:multi)  
+  select(state, st, lea_name, leaid, DI, d_locale_txt, diverse, total, aian:multi)  
 
 most_diverse_shape <- read_rds("data/most_diverse_shape.rds")
 
 most_diverse_centroid <- most_diverse_shape %>%
   inner_join(most_diverse, by = c("GEOID" = "leaid")) %>%
   st_transform(crs = 2163) %>%
-  select(lea_name, state, diverse, aian:multi) %>%
+  select(lea_name, state, DI, diverse, aian:multi) %>%
   mutate_at(vars(aian: multi), scales::percent, scale = 1) %>%
   st_centroid() %>% 
   mutate(type = "most")
@@ -300,14 +301,14 @@ most_diverse_centroid <- most_diverse_shape %>%
 
 least_diverse <- diversity_2017 %>% 
   filter(st %in% c("ME", "MT", "NH", "VT", "WV")) %>% 
-  select(state, lea_name, leaid, diverse, d_locale_txt, total, aian:multi)
+  select(state, lea_name, leaid, DI, d_locale_txt, diverse, total, aian:multi)
 
 least_diverse_shape <- read_rds("data/least_diverse_shape.rds")
 
 least_diverse_centroid <- least_diverse_shape %>%
   inner_join(least_diverse, by = c("GEOID" = "leaid")) %>%
   st_transform(crs = 2163) %>%
-  select(lea_name, state, diverse, aian:multi) %>%
+  select(lea_name, state, DI, diverse, aian:multi) %>%
   mutate_at(vars(aian: multi), scales::percent, scale = 1) %>%
   st_centroid() %>% 
   mutate(type = "least")
@@ -325,12 +326,13 @@ combined_centroid <- most_diverse_centroid %>%
 combined_centroid_map <- mapview(state_laea %>% 
           filter(GEOID %in% c(12, 24, 37, 10, 32, 
                               54, 33, 50, 23, 30)) %>% 
-    mutate(type = if_else(GEOID %in% c(12, 24, 37, 10, 32), "most", "least")),
-          zcol = "type",
-          legend = F,
+    mutate(type = if_else(GEOID %in% c(12, 24, 37, 10, 32), "最多样", "最不多样")),
+    zcol = "type",
+    legend = TRUE,
+    layer.name = "",
     map.type = "Stamen.Toner",
     col.region = c("#d0587e", "#88CCEE")) + 
-    mapview(combined_centroid, legend = FALSE,
+    mapview(combined_centroid %>% filter(DI > 0.95 | DI < 0.5), legend = FALSE,
             cex = 3) 
 
 combined_centroid_map
@@ -340,7 +342,7 @@ combined_centroid_map
 
 # 其他影响因素  
 
-一般认为，一个地区在不同种族上的人口分布越平均，工资差距越小，种族多样程度也也该越好。然而，结合 2017 年美国社区调查提供的收入和人口统计，却能发现两个与常识相违背的趋势：一个洲内部各个种族人口总数差距越大，多样性却越好；同样，州内部的工资（中位数）分布越极端，多样性也越好。  
+一般认为，一个地区在不同种族上的人口分布越平均，工资差距越小，种族多样程度也也该越好。然而，结合 2017 年美国社区调查提供的收入和人口统计，却能发现两个与常识相违背的趋势：一个洲内部各种族人口总数差距越大，多样性却越好；同样，一个州内不同种族的工资（中位数）分布越极端，多样性也越好。  
 
 @taeuber2008residential 针对这种反常的现象提供了一些解释，例如人口分布更极端的州内的少数族群往往有高于平均水平的社会经济地位，导致多样性反而上升了；以及种族之间单纯的平行工资比较未必能真正揭示经济水平上的差异，容易出现"虚高"和“虚低”的现象。  
 
