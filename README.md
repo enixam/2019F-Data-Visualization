@@ -48,9 +48,7 @@ tidycensus::get_acs("state", variables = c(
   "multi_income" = "B19013G_001",
   "hispanic_income" = "B19013I_001"
 )) %>% 
-   readr::write_rds("res_seg.rds")
-                                       
-                                   
+   readr::write_rds("res_seg.rds")                                                               
 ```
 
 
